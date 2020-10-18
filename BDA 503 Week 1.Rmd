@@ -1,0 +1,41 @@
+---
+title: "BDA 503 Week 1"
+author: "Serdar Kami Uckardes"
+date: "18-10-2020"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About Myself
+
+I graduted from MEF Univerity's Indutstrial Engineering Department in 2019 as a high honour student. After graduation I started working in Boyner’s compensation & benefits team and passed to TAV Airports Holding’s reward management team after a while. In both companies I carry out studies and projects on the establishment, execution and improvement of human resources systems and processes in order to transform human resources management strategies to practice. With my experiences both in university and business life, I have clearly noticed again how enjoyable, important and beneficial is to use data.
+
+This graduate program in “Big Data Analytics” would be unique opportunity to continue to hone my skills in the field of data analytics, programing and machine learning. Through the case studies and projects, I will be able to learn how to handle real-life situations. Also, with the gains of the program I will get the chance to realize the big data based, automated, recruitment process that I think out. Another plan in my mind is combining the programming and machine learning with reward management processes to better achieve its objectives. Since I work in reward management team in TAV, most of my projects are related to HR but I know big data is game changer almost in every industry and organization. Moreover, I will use these gains while dealing with my hobbies such as; investing in stocks, snow forecast, which I care about as much as my business life. With a new perspective and strong both technical and theoretical knowledge that I will obtain after successfully completing course, I believe that I can make difference not just in TAV or not just in HR but in many companies and in many departments.
+
+[Here is my LinkedIn profile](https://linkedin.com/in/kamiuckardes/)
+
+### [useR! 2020: Multi-stage Financial Modeling using Machine Learning in R (Y. Chen, X. Cai), lightning](https://www.youtube.com/watch?v=-cgwDHzd0p4&ab_channel=RConsortium)
+
+It is possible to analyze any subject you are interested in using R. Making some finacial analysis and financial modeling is one of them. When the subject is economy or finance it is not possible to think this topic without politics and current trends. Because of this, Y. chen and X. Cai did not take just technical analysisis into consider but also fundamental analysis, while doing this study. At the beginning of the study they collected various type of data from various type of sources. For instance they collected numeric data such as; close price of commodity and indicators of supply-demand economics and also collected text data such as political events and news articles. Then, with using r packages they preprocess -cleaned and merged- the data with different granularities and get one compact data frame. And again with using some other r pacakages they visaulize data and create different type of plots. In the final stage Y.Chen and X. Cai generated a model using some ML alghoritms and their model gave 71% of the variation of deciding future price of commodity.
+
+Long story short, being a good data scientist requires wider perspective. Approaching situations from different perspectives is really important in analysis. In the previous example we observed that  Y.Chen and X. Cai added politics tweets in their model and increase the models' accuracy. Another requirement of being good data scientis is using data analysis tool effectively. They collected various types of data but it was impossible to analyze without preporocessing and cleaning it. Last but not the least important requirement is getting familiar with ML alghoritms. Coolecting data from different sources, cleaning and pre-processing it, these are all importamt but if you want to get an output, if you want to put all these pieces together and create a meaningful whole, you need to know basics of ML alghoritms. If you meet all these requirements you will get a great model and with the help of the model you will make wiser decisons.   
+
+### [Stock Price Forecasting Using Time Series Analysis, Machine Learning and single layer neural network Models](https://rpubs.com/kapage/523169)
+
+I am really intersted in investing in stocks. I track my portfolia regularly every day. Although I make som tehnical and fundamental analyzes with myself while deciding which stock to keep and which stock to sell, I also want to generate a model and get support from the model in the decision making phase. 
+
+In the attached article Kenneth Page forecats stock price with using some machine learning algorithms and R. Some alghoritms used by him was Arima, Prophet forecasting, KNN regression time series forecasting and Neural Network. Author explains each algorithms' working mechanism step by step, and at end the end of the study compares the alghoritms with showing their cons. and pros.
+
+### [Weather Forecasting Using Decision Trees](https://rpubs.com/Cartwheel/weather)
+
+One of my favorite things to deal with in the winter is the snow forecast. The hobby that I interested amateurishly while I was in high school became an activity that I regularly deal with at university.  The modeling and data analysis courses that I took university contributed greatly to this. While I was making predictions by interpreting a few graphs at the beginning, I now collect data from dozens of sites and try to reach the result by analyzing them. What I noticed while doing all these works was; to encounter dirty data and challenging models, as I get into detail and handle with big data.
+
+In the attached file Author used decision tree alghoritm to predict whether it will rain or not. Data was collected at the Seattle-Tacoma International airport. 
+Study started with the pre-processing, cleaning. After removing #NA's, data had been split into training and test data in a ratio 4:1. MOdels' input were; (TMAX) the maximum temperature for that day, in degrees Fahrenheit and (TMIN) the minimum temperature for that day, in degrees Fahrenheit and output was RAIN (TRUE if rain was observed on that day, FALSE if it was not). Models' accuracy was 77%, which is not bad. 
+
+
+
+
+
