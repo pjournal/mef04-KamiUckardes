@@ -7,3 +7,4 @@
 - [Assignment: Electricity Market Prices](v8.html)
 - [Assignment 1: RMarkdown Homework](BDA 503 Week 1.html)
 
+### In Class Exercises
