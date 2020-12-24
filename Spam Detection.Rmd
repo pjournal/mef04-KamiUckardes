@@ -1,0 +1,215 @@
+---
+title: "Spam Detection"
+author: "Kami Uckardes"
+date: "12/19/2020"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Importing Necessary Packages and Dataset
+
+In this study dplyr and tidyverse packages are used for data manipulation, rpart,rpartplot and rattle packages are used to construct and visualize CART models. 
+
+```{r data1, warning=FALSE, message=FALSE}
+
+library(tidyverse) 
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(rattle)
+
+spamdata <- read.csv(file = 'spambase.csv')
+```
+
+### Pre-processing and Making Some Adjustments on Dataset
+
+- In order to get reliable results and creating reliable model, only complete cases are kept in dataset. After this process, 25% of data is classified as test data and remaining part is classifed as training data. 
+- In dataset, under class variable, 1 was representing spam and 0 was represting not spam. To make this part clear, 1 is changed with Spam and 0 is changed with Not Spam, and this new classes are kept in new factor variable, named spclass. And class variable is removed from dataset.
+
+```{r data2, warning=FALSE, message=FALSE}
+
+set.seed(58)
+
+  spamdata = spamdata%>%
+  filter(complete.cases(.)) %>%
+  mutate(train_test = ifelse(runif(nrow(.)) < 0.25,"test","train"))%>%
+  mutate(spclass = ifelse(spamdata$class == 1 ,'Spam','Not Spam'))%>%
+  tbl_df() %>% select(-class)
+
+spamdata$spclass <- factor(spamdata$spclass)
+```
+
+## Classification and Regression Trees (CART)
+
+A regression tree is created with rpart and visualized with rpart.plot.
+Regression tress are type of decision trees.
+
+Looking the tree below, we can say that; 
+
+- 60% of the data is not spam and 40% is spam. (With looking the node located in top)
+- If the char_freq_24% is not less than %5.6, and word_freq_hp is greater than eqaul to 41%, the probability of the mail being spam is only 6 percent.
+
+These are just some of the interpretations, it is possible to make some others.
+
+```{r data3, warning=FALSE, message=FALSE}
+spam_train <- spamdata %>% filter(train_test == "train") %>% select(-train_test)
+fit <- rpart(spclass ~ ., method="class", data=spam_train)
+fancyRpartPlot(fit)
+```
+
+### In Sample Prediction
+
+- In sample prediction means, creating/fitting a model with our training set and testing it again with it.
+- We see some prediction results of our model, and the accuracy of it the tables below, respectively.
+
+```{r data4, warning=FALSE, message=FALSE}
+spam_in_sample <- predict(fit)
+print(head(spam_in_sample))
+
+in_sample_prediction =
+  cbind(
+    spam_in_sample %>% tbl_df %>%
+      transmute(spam_predict = ifelse(Spam >= 0.5,1,0)),
+    spam_train %>%
+      transmute(spam_actual = ifelse(spclass == 'Spam',1,0))
+  ) %>% tbl_df %>%
+  mutate(correct_class = (spam_predict == spam_actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+
+print(in_sample_prediction)
+```
+### Out of Sample Prediction
+
+- Out of the sample prediction means, creating/fitting a model with our training set and testing it with our test set.
+- We see some prediction results of our model, and the accuracy of it the tables below, respectively.
+
+```{r data5, warning=FALSE, message=FALSE}
+spam_test <- spamdata %>% filter(train_test=="test") %>% select(-train_test)
+spam_predict <- predict(fit,newdata=spam_test)
+print(head(spam_predict))
+
+out_of_sample_prediction =
+  cbind(
+    spam_predict %>% tbl_df %>%
+      transmute(spam_predict = ifelse(Spam >= 0.5,1,0)),
+    spam_test %>% tbl_df %>%
+      transmute(spam_actual = ifelse(spclass == "Spam",1,0))
+  ) %>%
+  mutate(correct_class = (spam_predict == spam_actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+
+print(out_of_sample_prediction)
+```
+
+- In short, our model accuracy is **90.2%** and **90.4%** in *'In sample prediction'* and *'Out of the sample prediciton'*, respectively. 
+
+## Logistic Regression 
+
+- Logistic regression predicts whether something is (binary) True or False, or *Spam* and *Not Spam* in our case.
+
+- Some notes about **Logit** and **Probit**;
+  + In most scenarios, the logit and probit models fit the data equally well, with the following two exceptions.
+  + *Logit* is definitely better in the case of "extreme independent variables".
+  + *Probit* is better in the case of "random effects models".
+
+[For further details about Logit and Probit](https://stats.stackexchange.com/questions/20523/difference-between-logit-and-probit-models)
+
+```{r data6, warning=FALSE, message=FALSE}
+spam_logit_model <- glm(spclass ~ ., data=spam_train,family=binomial(link = "logit"))
+spam_probit_model <- glm(spclass ~ ., data=spam_train,family=binomial(link = "probit"))
+```
+
+### Logit - In Sample
+```{r data26, warning=FALSE, message=FALSE}
+spam_logit_in_sample <- predict(spam_logit_model,type="response")
+
+spam_logit_in_sample_prediction <-
+  data.frame(in_sample=(spam_logit_in_sample >= 0.5)*1,
+             actual=(spam_train$spclass == "Spam")*1) %>%
+  mutate(correct_class= (in_sample == actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+
+print(spam_logit_in_sample_prediction)
+```
+
+### Logit - Out of Sample
+```{r data16, warning=FALSE, message=FALSE}
+spam_logit_out_of_sample <- predict(spam_logit_model,newdata=spam_test,type="response")
+
+spam_logit_out_of_sample_prediction <-
+  data.frame(out_of_sample=(spam_logit_out_of_sample >= 0.5)*1,
+             actual=(spam_test$spclass == "Spam")*1) %>%
+  mutate(correct_class= (out_of_sample == actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+
+print(spam_logit_out_of_sample_prediction)
+```
+
+### Probit - In Sample
+```{r data7, warning=FALSE, message=FALSE}
+spam_probit_in_sample <- predict(spam_probit_model,type="response")
+
+spam_probit_in_sample_prediction <-
+  data.frame(in_sample=(spam_probit_in_sample >= 0.5)*1,
+             actual=(spam_train$spclass == "Spam")*1) %>%
+  mutate(correct_class= (in_sample == actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+print(spam_probit_in_sample_prediction)
+```
+
+### Probit - Out of Sample
+```{r data17, warning=FALSE, message=FALSE}
+spam_probit_out_of_sample <- predict(spam_probit_model,newdata=spam_test,type="response")
+
+spam_probit_out_of_sample_prediction <-
+  data.frame(out_of_sample=(spam_probit_out_of_sample >= 0.5)*1,
+             actual=(spam_test$spclass == "Spam")*1) %>%
+  mutate(correct_class= (out_of_sample == actual)) %>%
+  group_by(correct_class) %>%
+  summarise(count=n(),percentage=n()/nrow(.))
+
+print(spam_probit_out_of_sample_prediction)
+```
+
+## Benchmark
+
+- With looking the accuracy ratios below, we can conclude that;
+
+  + **Logistic regression with Logit Link** is the best model with the accuracy of **92.74%** and **93.09%**, in *'In sample prediction'* and *'Out of the sample prediciton'*, respectively.
+
+```{r data8, warning=FALSE, message=FALSE}
+complete_benchmark <- data.frame(
+  model = c("CART","Logistic Reg. - Logit Link","Logistic Reg. - Probit Link"),
+  in_sample_accuracy = c(
+    in_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist(),
+    spam_logit_in_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist(),
+    spam_probit_in_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist()
+  ),
+  out_of_sample_accuracy = c(
+    out_of_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist(),
+    spam_logit_out_of_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist(),
+    spam_probit_out_of_sample_prediction %>% filter(correct_class) %>% transmute(round(percentage,4)) %>% unlist()
+  )
+)
+print(complete_benchmark)
+```
+
+## References
+
+- [Data Source - Spambase](https://datahub.io/machine-learning/spambase)
+
+- [Statistical Models in R: Part 2](https://mef-bda503.github.io/archive/fall17/files/intro_to_ml_2.html)
+
+You may click [here](https://pjournal.github.io/mef04-KamiUckardes/) to reach other items of my progress journal.
+
